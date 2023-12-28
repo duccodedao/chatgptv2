@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT Chat</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #chat-output div {
+            margin-bottom: 10px;
+        }
+
+        #user-input {
+            width: 70%;
+            padding: 8px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-output"></div>
+        <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn...">
+        <button onclick="generateResponse()">Gửi</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easy-tensorflow.js"></script>
+    <script src="https://github.com/duccodedao/chatgptv2/model.json"></script>
+    <script src="https://github.com/duccodedao/chatgptv2/vocab.json"></script>
+
+    <script>
+        async function generateResponse() {
+            const userInput = document.getElementById('user-input').value;
+            document.getElementById('chat-output').innerHTML += '<div><strong>Bạn:</strong> ' + userInput + '</div>';
+
+            // Tokenize và sinh câu trả lời
+            const tokenizer = new Tokenizer();
+            tokenizer.setVocab(vocab);
+            const inputIds = tokenizer.encode(userInput);
+            const output = await model.predict(tf.tensor([inputIds]));
+
+            // Decode output và hiển thị câu trả lời
+            const response = tokenizer.decode(tf.argMax(output, 2).dataSync());
+            document.getElementById('chat-output').innerHTML += '<div><strong>GPT-2:</strong> ' + response + '</div>';
+        }
+    </script>
+</body>
+</html>
